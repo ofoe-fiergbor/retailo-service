@@ -1,0 +1,22 @@
+package io.iamofoe.ecommerceservice.domain.repository;
+
+import io.iamofoe.ecommerceservice.domain.model.Category;
+import io.iamofoe.ecommerceservice.domain.model.Product;
+import io.iamofoe.ecommerceservice.domain.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    Optional<Product> findProductByIdAndUser(long id, User user);
+    List<Product> findProductsByUser(User user);
+    List<Product> findProductsByCategory(Category category);
+
+    @Query(value = "SELECT * from products p where p.name like %:name%", nativeQuery = true)
+    List<Product> findProductsByName(@Param("name") String name);
+}
