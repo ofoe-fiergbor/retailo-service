@@ -4,7 +4,6 @@ import io.iamofoe.ecommerceservice.converter.CategoryToCategoryResponseDtoConver
 import io.iamofoe.ecommerceservice.domain.model.Category;
 import io.iamofoe.ecommerceservice.domain.repository.CategoryRepository;
 import io.iamofoe.ecommerceservice.dto.request.CategoryRequestDto;
-import io.iamofoe.ecommerceservice.dto.request.CategoryUpdateRequestDto;
 import io.iamofoe.ecommerceservice.dto.response.CategoryListResponseDto;
 import io.iamofoe.ecommerceservice.dto.response.CategoryResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +19,16 @@ public class CategoryRepositoryService implements CategoryService {
 
     @Override
     public CategoryResponseDto createNewCategory(CategoryRequestDto dto) {
+        if (categoryRepository.existsByName(dto.getName().toLowerCase())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Category already exist");
+        }
         return categoryConverter.convert(categoryRepository.save(new Category()
-                .setName(dto.getName())));
+                .setName(dto.getName().toLowerCase())));
     }
 
     @Override
     public CategoryResponseDto updateExistingCategory(CategoryRequestDto dto, long id) {
-        return categoryConverter.convert(categoryRepository.save(getCategoryById(id).setName(dto.getName())));
+        return categoryConverter.convert(categoryRepository.save(getCategoryById(id).setName(dto.getName().toLowerCase())));
     }
 
     @Override

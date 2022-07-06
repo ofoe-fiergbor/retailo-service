@@ -12,5 +12,5 @@ public class UpdateProductRequestDto {
     private String imageUrl;
     private double quantity;
     private String description;
-    private ProductVisibility productVisibility;
+    private ProductVisibility status;
 }

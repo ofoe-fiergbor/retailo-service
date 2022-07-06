@@ -1,10 +1,9 @@
 package io.iamofoe.ecommerceservice.domain.repository;
 
-import io.iamofoe.ecommerceservice.domain.model.Category;
+import io.iamofoe.ecommerceservice.domain.model.CheckoutProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
-    boolean existsByName(String name);
+public interface CheckoutProductRepository extends JpaRepository<CheckoutProduct, Long> {
 }

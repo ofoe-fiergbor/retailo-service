@@ -2,18 +2,23 @@ package io.iamofoe.ecommerceservice.service;
 
 import io.iamofoe.ecommerceservice.converter.ProductToProductResponseDtoConverter;
 import io.iamofoe.ecommerceservice.domain.model.Product;
-import io.iamofoe.ecommerceservice.domain.model.ProductVisibility;
 import io.iamofoe.ecommerceservice.domain.repository.ProductRepository;
 import io.iamofoe.ecommerceservice.dto.request.AddProductRequestDto;
 import io.iamofoe.ecommerceservice.dto.request.UpdateProductRequestDto;
 import io.iamofoe.ecommerceservice.dto.response.ProductListResponseDto;
 import io.iamofoe.ecommerceservice.dto.response.ProductResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
+
+import static io.iamofoe.ecommerceservice.domain.model.ProductVisibility.AVAILABLE;
+import static io.iamofoe.ecommerceservice.domain.model.ProductVisibility.HIDDEN;
 
 @Service
 @RequiredArgsConstructor
@@ -33,18 +38,23 @@ public class ProductRepositoryService implements ProductService {
     @Override
     public ProductListResponseDto getProducts(long userId) {
         return ProductListResponseDto.builder()
-                .products(productRepository
-                        .findProductsByUser(userRepositoryService.getUserWithId(userId))
+                .products(getProductsByUser(userId)
                         .stream()
                         .map(productResponseDtoConverter::convert).toList())
                 .build();
     }
 
     @Override
+    public Page<ProductResponseDto> getAllProductsPaginated(Pageable page) {
+        Page<Product> allProducts = productRepository.findProductByProductVisibility(AVAILABLE, page);
+        return allProducts.map(productResponseDtoConverter::convert);
+    }
+
+    @Override
     public ProductListResponseDto searchProduct(String productName) {
         return ProductListResponseDto.builder()
                 .products(productRepository
-                        .findProductsByName(productName.toLowerCase())
+                        .findByName(productName)
                         .stream().map(productResponseDtoConverter::convert)
                         .toList())
                 .build();
@@ -64,9 +74,10 @@ public class ProductRepositoryService implements ProductService {
         Product newProduct = productRepository.save(new Product()
                 .setName(dto.getName())
                 .setPrice(dto.getPrice())
+                .setQuantity(dto.getQuantity())
                 .setImageUrl(dto.getImageUrl())
                 .setDescription(dto.getDescription())
-                .setProductVisibility(ProductVisibility.AVAILABLE)
+                .setProductVisibility(HIDDEN)
                 .setUser(userRepositoryService.getUserWithId(dto.getUserId()))
                 .setCategory(categoryRepositoryService.getCategoryById(dto.getCategoryId())));
         return productResponseDtoConverter.convert(newProduct);
@@ -74,15 +85,27 @@ public class ProductRepositoryService implements ProductService {
 
     @Override
     public ProductResponseDto updateProduct(UpdateProductRequestDto dto, long productId) {
-        Product updatedProduct = productRepository.save(productRepository.findProductByIdAndUser(productId, userRepositoryService.getUserWithId(productId))
+        Optional<Product> productByIdAndUser = productRepository.findProductByIdAndUser(productId, userRepositoryService.getUserWithId(dto.getUserId()));
+        Product updatedProduct = productRepository.save(productByIdAndUser
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id: " + productId + " not found."))
                 .setCategory(categoryRepositoryService.getCategoryById(dto.getCategoryId()))
                 .setPrice(dto.getPrice())
                 .setImageUrl(dto.getImageUrl())
                 .setQuantity(dto.getQuantity())
-                .setDescription(dto.getDescription())
-                .setProductVisibility(dto.getProductVisibility())
+                .setDescription(dto.getDescription().toLowerCase())
+                .setProductVisibility(dto.getStatus())
         );
         return productResponseDtoConverter.convert(updatedProduct);
+    }
+
+    @Override
+    public List<Product> getProductsByUser(long userId) {
+        return productRepository
+                .findProductsByUser(userRepositoryService.getUserWithId(userId));
+    }
+
+    public Product getProductById(long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

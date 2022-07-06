@@ -1,10 +1,10 @@
 package io.iamofoe.ecommerceservice.dto.request;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
-@Builder
+@Data
+@NoArgsConstructor
 public class CategoryRequestDto {
     String name;
 }

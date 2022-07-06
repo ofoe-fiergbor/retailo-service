@@ -4,6 +4,7 @@ import io.iamofoe.ecommerceservice.security.JwtFilter;
 import io.iamofoe.ecommerceservice.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -45,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers( "/test", "/api/v1/user/register", "/api/v1/user/login").permitAll();
+        http.authorizeRequests().antMatchers( "/api/v1/products", "/api/v1/user/register", "/api/v1/user/login").permitAll();
         http.authorizeRequests().antMatchers("/v3/api-docs/**","/swagger-ui/**", "/swagger-ui.html").permitAll();
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

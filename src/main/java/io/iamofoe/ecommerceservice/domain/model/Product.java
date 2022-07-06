@@ -27,4 +27,7 @@ public class Product {
     private User user;
     @ManyToOne
     private Category category;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "checkout_product_id")
+    private CheckoutProduct checkoutProduct;
 }

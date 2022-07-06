@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -26,12 +28,19 @@ public class ProductController {
 
     private final ProductService productService;
 
+
+    @GetMapping
+    @Operation(summary = "Get all products paginated")
+    public Page<ProductResponseDto> getAllProducts(Pageable pageable) {
+        return productService.getAllProductsPaginated(pageable);
+    }
+
     @GetMapping("/category/{categoryId}")
     @Operation(summary = "Get all products for a category and/or by name.")
     public ResponseEntity<ProductListResponseDto> getAllProductsForCategory(@PathVariable long categoryId) {
         return new ResponseEntity<>(productService.getProductsByACategory(categoryId), HttpStatus.OK);
     }
-    @GetMapping
+    @GetMapping("/product")
     @Operation(summary = "Search for a product.")
         public ResponseEntity<ProductListResponseDto> searchForProduct(@RequestParam String productName) {
         return new ResponseEntity<>(productService.searchProduct(productName), HttpStatus.OK);
