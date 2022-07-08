@@ -5,13 +5,11 @@ import lombok.Value;
 
 @Value
 @Builder
-public class CheckoutProductResponseDto {
+public class CheckoutProductDto {
     long id;
     String name;
     double price;
-    long productId;
     double quantity;
-    CategoryResponseDto category;
     String imageUrl;
-    String description;
+    CategoryResponseDto category;
 }

@@ -1,16 +1,16 @@
 package io.iamofoe.ecommerceservice.dto.response;
 
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.util.Date;
+import java.util.List;
 
 @Value
 @Builder
-public class CheckoutResponseDto {
+public class CheckoutTransactionHistoryDto {
     long id;
-    double amount;
     Date date;
+    double amount;
+    List<CheckoutProductDto> products;
 }

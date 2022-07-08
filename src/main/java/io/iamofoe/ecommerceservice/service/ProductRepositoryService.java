@@ -71,7 +71,7 @@ public class ProductRepositoryService implements ProductService {
 
     @Override
     public ProductResponseDto addProduct(AddProductRequestDto dto) {
-        Product newProduct = productRepository.save(new Product()
+        Product newProduct = saveProduct(new Product()
                 .setName(dto.getName())
                 .setPrice(dto.getPrice())
                 .setQuantity(dto.getQuantity())
@@ -85,17 +85,25 @@ public class ProductRepositoryService implements ProductService {
 
     @Override
     public ProductResponseDto updateProduct(UpdateProductRequestDto dto, long productId) {
-        Optional<Product> productByIdAndUser = productRepository.findProductByIdAndUser(productId, userRepositoryService.getUserWithId(dto.getUserId()));
-        Product updatedProduct = productRepository.save(productByIdAndUser
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id: " + productId + " not found."))
-                .setCategory(categoryRepositoryService.getCategoryById(dto.getCategoryId()))
-                .setPrice(dto.getPrice())
-                .setImageUrl(dto.getImageUrl())
-                .setQuantity(dto.getQuantity())
-                .setDescription(dto.getDescription().toLowerCase())
-                .setProductVisibility(dto.getStatus())
+        Product updatedProduct = saveProduct(
+                getProductByIdAndUser(dto, productId)
+                    .setCategory(categoryRepositoryService.getCategoryById(dto.getCategoryId()))
+                    .setPrice(dto.getPrice())
+                    .setImageUrl(dto.getImageUrl())
+                    .setQuantity(dto.getQuantity())
+                    .setDescription(dto.getDescription().toLowerCase())
+                    .setProductVisibility(dto.getStatus())
         );
         return productResponseDtoConverter.convert(updatedProduct);
+    }
+
+    private Product getProductByIdAndUser(UpdateProductRequestDto dto, long productId) {
+        return productRepository.findProductByIdAndUser(productId, userRepositoryService.getUserWithId(dto.getUserId()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id: " + productId + " not found."));
+    }
+
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
     }
 
     @Override

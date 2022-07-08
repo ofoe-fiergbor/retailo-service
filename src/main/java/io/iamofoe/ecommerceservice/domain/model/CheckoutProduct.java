@@ -12,15 +12,15 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Accessors(chain = true)
-@Table(name = "Checkout_product")
+@Table(name = "Checkout_products")
 public class CheckoutProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    @OneToOne(mappedBy = "checkoutProduct")
-    private Product product;
-    private double quantity;
     private double price;
+    private double quantity;
+    @OneToOne
+    private Product product;
     @ManyToOne
-    private CheckoutTransaction checkoutTransaction;
+    private CheckoutTransaction transactions;
 }

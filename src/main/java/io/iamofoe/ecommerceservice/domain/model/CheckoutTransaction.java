@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -20,12 +19,10 @@ public class CheckoutTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    @OneToMany
+    @OneToMany(mappedBy = "transactions")
     private List<CheckoutProduct> products;
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
     private double amount;
     @ManyToOne
     private User user;
+    private Date created;
 }
